@@ -1,3 +1,7 @@
+class ContextPath:
+    CONTEXT_PATH = '/finance'
+
+
 class UpbitPath:
     BASE_URL = 'https://api.upbit.com'
 

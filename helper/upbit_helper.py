@@ -6,19 +6,16 @@ from core.config import Config
 from core.path import UpbitPath
 from exception.upbit_request_failure import UpbitRequestFailureException
 
+BASE_URL = UpbitPath.BASE_URL
+
 
 def upbit_request(path: str):
-    base_url = UpbitPath.BASE_URL
-
-    res = requests.get(base_url + path, headers=_get_headers())
+    res = requests.get(BASE_URL + path, headers=_get_headers())
 
     if res.status_code != 200:
         raise UpbitRequestFailureException('upbit 요청 실패 - ' + path)
 
-    return {
-        'success': True,
-        'data': res.json()
-    }
+    return res.json()
 
 
 def _get_headers():

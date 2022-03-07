@@ -15,3 +15,5 @@ class Config:
     DB_HOST = os.environ.get('DB_HOST')
     DB_PORT = os.environ.get('DB_PORT')
     DB_SCHEMA = os.environ.get('DB_SCHEMA')
+
+    DB_FULL_URL = f'postgresql+psycopg2://{DB_USER_NAME}:{DB_USER_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_SCHEMA}'

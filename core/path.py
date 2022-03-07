@@ -1,5 +1,5 @@
 class ContextPath:
-    CONTEXT_PATH = '/finance'
+    CONTEXT_PATH = '/api/finance'
 
 
 class UpbitPath:

@@ -3,13 +3,17 @@ from urllib.request import Request
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
-from api.upbit import upbit_router
+from api.account import account_router
+from api.coin import coin_router
+from core.database import engine, Base
 from exception.upbit_request_failure import UpbitRequestFailureException
+
+Base.metadata.create_all(bind=engine)
 
 # swagger 비활성화
 app = FastAPI(openapi_url=None)
-
-app.include_router(upbit_router)
+app.include_router(coin_router)
+app.include_router(account_router)
 
 
 @app.exception_handler(UpbitRequestFailureException)

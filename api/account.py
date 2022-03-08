@@ -4,16 +4,19 @@ from fastapi import APIRouter, Depends
 from core.container import Container
 from core.path import ContextPath
 from repository.account_repository import AccountRepository
-from schema.login_schema import LoginSchema
-from service import login_service
+from schema.account_schema import LoginSchema
+from service.account_service import AccountService
 
 account_router = APIRouter(prefix=f'{ContextPath.CONTEXT_PATH}/account/v1')
 
 
 @account_router.post('/login')
 @inject
-async def login(login_schema: LoginSchema = None):
-    return login_service.login()
+async def login(
+        login_schema: LoginSchema = None,
+        account_service: AccountService = Depends(Provide[Container.account_service])
+):
+    return account_service.login(login_schema)
 
 
 @account_router.get('/check-duplicate')

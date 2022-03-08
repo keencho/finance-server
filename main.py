@@ -30,8 +30,10 @@ async def access_db_middleware(request: Request, call_next):
             if chunk != b'null':
                 body += chunk
 
+        # 1. byte to str
         response_body: str = body.decode('utf-8')
 
+        # 2. check if response_body is json format
         try:
             response_body = json.loads(response_body)
         except json.JSONDecodeError:
@@ -47,7 +49,7 @@ async def access_db_middleware(request: Request, call_next):
         )
     except FinanceCommonException as e:
         return JSONResponse(
-            status_code=400,
+            status_code=200,
             content={
                 'success': False,
                 'message' : f'{e}'
@@ -55,7 +57,7 @@ async def access_db_middleware(request: Request, call_next):
         )
     except Exception:
         return JSONResponse(
-            status_code=400,
+            status_code=200,
             content={
                 'success': False,
                 'message' : '알수없는 에러가 발생했습니다.'

@@ -23,3 +23,8 @@ class Account(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class JwtToken(BaseModel):
+    access_token: str
+    type_token: str

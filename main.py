@@ -37,7 +37,7 @@ async def access_db_middleware(request: Request, call_next):
         try:
             response_body = json.loads(response_body)
         except json.JSONDecodeError:
-            # 'response body ' was not as json format
+            # 'response body ' is not json format
             print('not json format')
 
         return JSONResponse(

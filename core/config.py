@@ -20,3 +20,4 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
     JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM')
     JWT_TOKEN_EXPIRE_MINUTES = os.environ.get('JWT_TOKEN_EXPIRE_MINUTES')
+    JWT_COOKIE_NAME = os.environ.get('JWT_COOKIE_NAME')

@@ -1,5 +1,5 @@
 from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 
 from core.container import Container
 from core.path import ContextPath
@@ -13,10 +13,11 @@ account_router = APIRouter(prefix=f'{ContextPath.CONTEXT_PATH}/account/v1')
 @account_router.post('/login')
 @inject
 async def login(
+        response: Response,
         login_schema: LoginSchema = None,
-        account_service: AccountService = Depends(Provide[Container.account_service])
+        account_service: AccountService = Depends(Provide[Container.account_service]),
 ):
-    return account_service.login(login_schema)
+    return account_service.login(login_schema=login_schema, response=response)
 
 
 @account_router.get('/check-duplicate')

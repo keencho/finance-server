@@ -21,7 +21,7 @@ app.include_router(account_router)
 
 
 @app.middleware("http")
-async def access_db_middleware(request: Request, call_next):
+async def middelware_handler(request: Request, call_next):
     try:
         response = await call_next(request)
 
@@ -41,11 +41,9 @@ async def access_db_middleware(request: Request, call_next):
             print('not json format')
 
         return JSONResponse(
-            content={
-                'success:': True,
-                'data': response_body
-            },
-            status_code=200,
+            content=response_body,
+            headers=dict(response.headers),
+            status_code=200
         )
     except FinanceCommonException as e:
         return JSONResponse(

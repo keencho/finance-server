@@ -1,3 +1,6 @@
+from fastapi import Response
+
+from core.config import Config
 from exception.exception import FinanceCommonException
 from repository.account_repository import AccountRepository
 from schema.account_schema import LoginSchema, JwtTokenAccount
@@ -14,7 +17,7 @@ class AccountService:
         self._account_repository: AccountRepository = account_repository
         self._jwt_service: JwtService = jwt_service
 
-    def login(self, login_schema: LoginSchema):
+    def login(self, login_schema: LoginSchema, response: Response):
         account = self._account_repository.get_account_by_login_id(login_schema.login_id)
 
         if account is None:
@@ -24,6 +27,8 @@ class AccountService:
             raise FinanceCommonException('비밀번호가 일치하지 않습니다.')
 
         access_token = self._jwt_service.create_access_token(data=JwtTokenAccount.from_orm(account).dict())
+
+        response.set_cookie(key=Config.JWT_COOKIE_NAME, value=access_token)
 
         return access_token
 

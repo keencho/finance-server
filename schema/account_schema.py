@@ -15,16 +15,11 @@ class AccountCreateBase(BaseModel):
     upbit_private_key: Optional[str]
 
 
-class Account(BaseModel):
+class JwtTokenAccount(BaseModel):
     id: str
     login_id: str
-    upbit_access_key: Optional[str]
-    upbit_private_key: Optional[str]
+    # upbit_access_key: Optional[str]
+    # upbit_private_key: Optional[str]
 
     class Config:
         orm_mode = True
-
-
-class JwtToken(BaseModel):
-    access_token: str
-    type_token: str

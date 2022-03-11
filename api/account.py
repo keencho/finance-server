@@ -13,15 +13,30 @@ from util.response_util import build_success_response
 account_router = APIRouter(prefix=f'{ContextPath.CONTEXT_PATH}/account/v1')
 
 
+@account_router.post('/check-auth')
+@inject
+@requires(['authenticated'])
+async def check_auth(request: Request):
+    return build_success_response(data=request.state.current_account)
+
+
 @account_router.post('/login')
 @inject
 async def login(
-        request: Request,
         response: Response,
         login_schema: LoginSchema = None,
         account_service: AccountService = Depends(Provide[Container.account_service]),
 ):
-    return build_success_response(account_service.login(login_schema=login_schema, response=response))
+    return build_success_response(data=account_service.login(login_schema=login_schema, response=response))
+
+
+@account_router.post('/logout')
+@inject
+async def logout(
+        response: Response,
+        account_service: AccountService = Depends(Provide[Container.account_service])
+):
+    return build_success_response(data=account_service.logout(response))
 
 
 @account_router.get('/check-duplicate')

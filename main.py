@@ -4,6 +4,7 @@ from urllib.request import Request
 from fastapi import FastAPI
 from starlette.authentication import AuthenticationBackend, AuthCredentials, SimpleUser
 from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from api.account import account_router
@@ -24,6 +25,16 @@ app = FastAPI(openapi_url=None)
 app.include_router(coin_router)
 app.include_router(account_router)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
 
 class BasicAuthBackend(AuthenticationBackend):
     async def authenticate(self, conn):
@@ -32,8 +43,12 @@ class BasicAuthBackend(AuthenticationBackend):
 
         jwt_token_account = None
         if jwt_token is not None:
-            token = decode_access_token(token=jwt_token)
-            jwt_token_account = JwtTokenAccount.parse_obj(token)
+            try:
+                token = decode_access_token(token=jwt_token)
+                jwt_token_account = JwtTokenAccount.parse_obj(token)
+            except:
+                # 이 에러는 exp가 만료되었음을 의미함.
+                jwt_token_account: None
 
         conn.state.current_account = jwt_token_account
 
@@ -47,7 +62,7 @@ app.add_middleware(AuthenticationMiddleware, backend=BasicAuthBackend())
 
 
 @app.middleware("http")
-async def middelware_handler(request: Request, call_next):
+async def middleware_handler(request: Request, call_next):
     try:
         response = await call_next(request)
 

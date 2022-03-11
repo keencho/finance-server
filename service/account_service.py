@@ -3,7 +3,7 @@ from fastapi import Response
 from core.config import Config
 from exception.exception import FinanceCommonException
 from repository.account_repository import AccountRepository
-from schema.account_schema import LoginSchema, JwtTokenAccount
+from schema.account_schema import LoginSchema, JwtTokenAccount, AccountCreateBase
 from util.jwt_util import create_access_token
 from util.password_util import check_password
 
@@ -30,3 +30,6 @@ class AccountService:
 
         return access_token
 
+    def logout(self, response: Response):
+        response.set_cookie(key=Config.JWT_COOKIE_NAME, value='')
+        return None

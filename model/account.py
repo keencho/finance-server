@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Integer
 
 from core.database import Base
 
@@ -14,4 +14,6 @@ class Account(Base):
     password = Column(String, nullable=False)
     upbit_access_key = Column(String, nullable=True)
     upbit_private_key = Column(String, nullable=True)
+    telegram_token = Column(String, nullable=True)
+    telegram_chat_id = Column(Integer, nullable=True)
 

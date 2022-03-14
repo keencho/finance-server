@@ -21,4 +21,13 @@ class UpbitPath:
     # 5. 주문하기 (POST)
     ORDERS_REQUEST = '/v1/orders'
 
+    # 조회
+    # 1. 마켓 코드 조회
+    QUOTATION_MARKET_CODE = '/v1/market/all'
+    # 2. Ticker / 현재가 조회
+    QUOTATION_TICKER = '/v1/ticker'
+    # 3. 호가 정보 조회
+    QUOTATION_ORDERBOOK = '/v1/orderbook'
+
+
 

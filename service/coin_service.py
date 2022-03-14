@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import create_engine, orm
 
 from core.database import Base
@@ -18,6 +20,7 @@ session_factory = orm.scoped_session(
 market_repository = MarketRepository(session_factory=session_factory)
 
 
+# TODO: 전체 마켓 조회후 없어진 마켓 삭제
 def create_market():
     for row in get_market_code():
         exist_row = market_repository.get_market_by_code(row['market'])
@@ -32,7 +35,7 @@ def create_market():
 
 
 def init():
-    for row in get_orderbook(['KRW-BTC', 'KRW-ETH']):
+    for row in get_orderbook(['ALL']):
         json_beauty_print(row)
 
 

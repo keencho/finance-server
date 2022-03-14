@@ -35,6 +35,8 @@ def _get_headers():
 
 def get_market_code():
     """
+    전체 마켓 코드 조회
+
     market          업비트에서 제공중인 시장 정보
     korean_name     거래 대상 암호화폐 한글명
     english_name    거래 대상 암호화폐 영문명
@@ -44,6 +46,8 @@ def get_market_code():
 
 def get_ticker(markets: list):
     """
+    티커 조회
+
     market	                종목 구분 코드	            String
     trade_date	            최근 거래 일자(UTC)           String
     trade_time	            최근 거래 시각(UTC)           String
@@ -77,6 +81,8 @@ def get_ticker(markets: list):
 
 def get_orderbook(markets: list):
     """
+    호가 조회
+
     market	            마켓 코드	        String
     timestamp	        호가 생성 시각	    Long
     total_ask_size	    호가 매도 총 잔량	    Double

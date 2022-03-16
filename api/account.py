@@ -3,12 +3,12 @@ from fastapi import APIRouter, Depends, Response
 from starlette.authentication import requires
 from starlette.requests import Request
 
+import schema
+import util
 from core.container import Container
 from core.path import ContextPath
 from repository.account_repository import AccountRepository
-from schema.account_schema import LoginSchema
 from service.account_service import AccountService
-from util.response_util import build_success_response
 
 account_router = APIRouter(prefix=f'{ContextPath.CONTEXT_PATH}/account/v1')
 
@@ -17,17 +17,17 @@ account_router = APIRouter(prefix=f'{ContextPath.CONTEXT_PATH}/account/v1')
 @inject
 @requires(['authenticated'])
 async def check_auth(request: Request):
-    return build_success_response(data=request.state.current_account)
+    return util.build_success_response(data=request.state.current_account)
 
 
 @account_router.post('/login')
 @inject
 async def login(
         response: Response,
-        login_schema: LoginSchema = None,
+        login_schema: schema.LoginSchema = None,
         account_service: AccountService = Depends(Provide[Container.account_service]),
 ):
-    return build_success_response(data=account_service.login(login_schema=login_schema, response=response))
+    return util.build_success_response(data=account_service.login(login_schema=login_schema, response=response))
 
 
 @account_router.post('/logout')
@@ -36,7 +36,7 @@ async def logout(
         response: Response,
         account_service: AccountService = Depends(Provide[Container.account_service])
 ):
-    return build_success_response(data=account_service.logout(response))
+    return util.build_success_response(data=account_service.logout(response))
 
 
 @account_router.get('/check-duplicate')

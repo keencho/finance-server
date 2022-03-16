@@ -3,9 +3,9 @@ from typing import Callable
 
 from sqlalchemy.orm import Session
 
+import schema
+import util
 from model.account import Account
-from schema.account_schema import AccountCreateBase
-from util.password_util import encrypt_password
 
 
 class AccountRepository:
@@ -16,10 +16,10 @@ class AccountRepository:
         with self.session_factory() as session:
             return session.query(Account).filter(Account.login_id == login_id).first()
 
-    def create(self, account_create_base: AccountCreateBase) -> Account:
+    def create(self, account_create_base: schema.AccountCreateBase) -> Account:
         account = Account(
             login_id=account_create_base.login_id,
-            password=encrypt_password(account_create_base.password),
+            password=util.encrypt_password(account_create_base.password),
             upbit_access_key=account_create_base.upbit_access_key,
             upbit_private_key=account_create_base.upbit_private_key
         )

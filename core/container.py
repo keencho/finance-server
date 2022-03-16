@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 
-from core.config import Config
+import core
 from core.database import Database
 from repository.account_repository import AccountRepository
 from service.account_service import AccountService
@@ -11,7 +11,7 @@ class Container(containers.DeclarativeContainer):
 
     db = providers.Singleton(
         Database,
-        db_url=f'{Config.DB_FULL_URL}'
+        db_url=f'{core.Config.DB_FULL_URL}'
     )
 
     # inject

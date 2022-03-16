@@ -3,8 +3,8 @@ from typing import Callable
 
 from sqlalchemy.orm import Session
 
+import schema
 from model.market import Market
-from schema.market_schema import MarketCreateBase
 
 
 class MarketRepository:
@@ -15,7 +15,7 @@ class MarketRepository:
         with self.session_factory() as session:
             return session.query(Market).filter(Market.code == code).first()
 
-    def create(self, base: MarketCreateBase):
+    def create(self, base: schema.MarketCreateBase):
         market = Market(
             code=base.code,
             korean_name=base.korean_name,

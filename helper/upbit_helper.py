@@ -1,13 +1,14 @@
 import uuid
 
 import jwt
+import pyupbit
 import requests
 
+import core
 from core.config import Config
-from core.path import UpbitPath
 from exception.exception import FinanceCommonException
 
-BASE_URL = UpbitPath.BASE_URL
+BASE_URL = core.UpbitPath.BASE_URL
 
 
 def upbit_request(path: str):
@@ -21,7 +22,7 @@ def upbit_request(path: str):
 
 def _get_headers():
     payload = {
-            'access_key': Config.UPBIT_ACCESS_KEY,
+            'access_key': core.Config.UPBIT_ACCESS_KEY,
             'nonce': str(uuid.uuid4())
     }
 
@@ -39,7 +40,7 @@ def get_market_code():
     korean_name     거래 대상 암호화폐 한글명
     english_name    거래 대상 암호화폐 영문명
     """
-    return upbit_request(UpbitPath.QUOTATION_MARKET_CODE)
+    return upbit_request(core.UpbitPath.QUOTATION_MARKET_CODE)
 
 
 def get_ticker(markets: list):
@@ -72,7 +73,7 @@ def get_ticker(markets: list):
     lowest_52_week_date	    52주 신저가 달성일	        String
     timestamp	            타임스탬프	                Long
     """
-    return upbit_request(UpbitPath.QUOTATION_TICKER + '?markets=' + ",".join(markets))
+    return upbit_request(core.UpbitPath.QUOTATION_TICKER + '?markets=' + ",".join(markets))
 
 
 def get_orderbook(markets: list):
@@ -87,4 +88,13 @@ def get_orderbook(markets: list):
     ask_size	        매도 잔량	        Double
     bid_size	        매수 잔량	        Double
     """
-    return upbit_request(UpbitPath.QUOTATION_ORDERBOOK + '?markets=' + ",".join(markets))
+    return upbit_request(core.UpbitPath.QUOTATION_ORDERBOOK + '?markets=' + ",".join(markets))
+
+
+def get_ohlcv(ticker="KRW-BTC", interval="day", count=200, to=None, period=0.1):
+    """
+    ohlcv(시가, 고가, 저가, 종가, 거래량 조회)
+
+    :return: Pandas DataFrame
+    """
+    return pyupbit.get_ohlcv(ticker, interval, count, to, period)

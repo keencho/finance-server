@@ -7,13 +7,13 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
+import core
+import schema
+import util
 from api.account import account_router
 from api.coin import coin_router
-from core.config import Config
 from core.container import Container
 from exception.exception import FinanceCommonException, FinanceNotFoundException, FinanceUnAuthorizedException
-from schema.account_schema import JwtTokenAccount
-from util.jwt_util import decode_access_token
 
 container = Container()
 
@@ -39,13 +39,13 @@ app.add_middleware(
 class BasicAuthBackend(AuthenticationBackend):
     async def authenticate(self, conn):
         cookies = conn.cookies
-        jwt_token = cookies.get(Config.JWT_COOKIE_NAME)
+        jwt_token = cookies.get(core.Config.JWT_COOKIE_NAME)
 
         jwt_token_account = None
         if jwt_token is not None:
             try:
-                token = decode_access_token(token=jwt_token)
-                jwt_token_account = JwtTokenAccount.parse_obj(token)
+                token = util.decode_access_token(token=jwt_token)
+                jwt_token_account = schema.JwtTokenAccount.parse_obj(token)
             except:
                 # 이 에러는 exp가 만료되었음을 의미함.
                 jwt_token_account: None

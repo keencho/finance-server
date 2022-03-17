@@ -45,7 +45,7 @@ def get_market_code():
     return upbit_request(core.UpbitPath.QUOTATION_MARKET_CODE)
 
 
-def get_ticker(markets: list):
+def get_ticker(tickers: list):
     """
     티커 조회
 
@@ -77,7 +77,11 @@ def get_ticker(markets: list):
     lowest_52_week_date	    52주 신저가 달성일	        String
     timestamp	            타임스탬프	                Long
     """
-    return upbit_request(core.UpbitPath.QUOTATION_TICKER + '?markets=' + ",".join(markets))
+    return upbit_request(core.UpbitPath.QUOTATION_TICKER + '?markets=' + ",".join(tickers))
+
+
+def get_current_price(ticker="KRW-BTC"):
+    return pyupbit.get_current_price(ticker=ticker)
 
 
 def get_orderbook(markets: list):

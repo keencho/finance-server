@@ -1,7 +1,9 @@
 import pandas as pd
 from sqlalchemy import create_engine, orm
 
+import helper
 import schema
+import util
 from core.database import Base
 from helper.upbit_helper import *
 from repository.market_repository import MarketRepository
@@ -31,13 +33,22 @@ def create_market():
         market_repository.create(base)
 
 
-def bull_market():
-    with pd.option_context(
-            'display.max_rows', None,
-            'display.max_columns', None,
-            'display.width', None):
-        print(get_ohlcv("KRW-BTC"))
+def is_bull_market():
+    moving_average_window = 5
+
+    with util.pandas_beauty_print():
+        ticker = 'KRW-BTC'
+        ohlcv = get_ohlcv(ticker)
+
+        close_price = ohlcv['close']
+        # -1: 오늘, -2: 어제
+        last_ma5 = close_price.rolling(moving_average_window).mean()[-2]
+        price = helper.get_current_price(ticker)
+        print(last_ma5)
+        print(price)
+
+        return price > last_ma5
 
 
 if __name__ == '__main__':
-    bull_market()
+    is_bull_market()

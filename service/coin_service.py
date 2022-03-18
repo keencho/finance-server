@@ -33,22 +33,23 @@ def create_market():
         market_repository.create(base)
 
 
-def is_bull_market():
+def is_bull_market(ticker: str):
+    """
+    상승장 여부 확인
+    """
     moving_average_window = 5
 
     with util.pandas_beauty_print():
-        ticker = 'KRW-BTC'
         ohlcv = get_ohlcv(ticker)
 
         close_price = ohlcv['close']
         # -1: 오늘, -2: 어제
         last_ma5 = close_price.rolling(moving_average_window).mean()[-2]
         price = helper.get_current_price(ticker)
-        print(last_ma5)
-        print(price)
 
         return price > last_ma5
 
 
 if __name__ == '__main__':
-    is_bull_market()
+    t = is_bull_market(ticker="KRW-ETH")
+    print(t)

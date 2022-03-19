@@ -13,3 +13,6 @@ async def get_assets():
     return upbit_request(UpbitPath.ACCOUNT_INQUIRY)
 
 
+@coin_router.get("/bull-market")
+async def get_bull_market_data():
+    return 'Hi'

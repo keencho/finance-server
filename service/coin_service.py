@@ -52,4 +52,3 @@ def is_bull_market(ticker: str):
 
 if __name__ == '__main__':
     t = is_bull_market(ticker="KRW-ETH")
-    print(t)

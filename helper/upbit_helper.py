@@ -34,6 +34,13 @@ def _get_headers():
 ################################################################
 
 
+def get_account_info_list():
+    """
+    전체 계좌 조회
+    """
+    return upbit_request(core.UpbitPath.ACCOUNT_INQUIRY)
+
+
 def get_market_code():
     """
     전체 마켓 코드 조회

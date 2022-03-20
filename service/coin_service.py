@@ -1,4 +1,3 @@
-import pandas as pd
 from sqlalchemy import create_engine, orm
 
 import helper
@@ -6,6 +5,7 @@ import schema
 import util
 from core.database import Base
 from helper.upbit_helper import *
+from repository import AccountRepository
 from repository.market_repository import MarketRepository
 
 engine = create_engine(core.Config.DB_FULL_URL)
@@ -18,6 +18,7 @@ session_factory = orm.scoped_session(
     )
 )
 market_repository = MarketRepository(session_factory=session_factory)
+account_repository = AccountRepository(session_factory=session_factory)
 
 
 def create_market():
@@ -50,5 +51,16 @@ def is_bull_market(ticker: str):
         return price > last_ma5
 
 
+def get_balance(ticker: str):
+    if len(ticker) == 0:
+        return None
+
+    try:
+        account_info_list = get_account_info_list()
+        return next(i for i in account_info_list if i['currency'] == ticker)
+    except:
+        return None
+
+
 if __name__ == '__main__':
-    t = is_bull_market(ticker="KRW-ETH")
+    balance = get_balance('KRW')

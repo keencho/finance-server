@@ -32,6 +32,7 @@ app.add_middleware(
 )
 
 
+# post construct
 @app.on_event('startup')
 async def startup_event():
     super_admin_account = account_repository.get_by_login_id(Config.SUPER_ADMIN_ID)

@@ -6,7 +6,7 @@ import requests
 
 import core
 from core.config import Config
-from exception.exception import FinanceCommonException
+from core.exception import FinanceCommonException
 
 BASE_URL = core.UpbitPath.BASE_URL
 

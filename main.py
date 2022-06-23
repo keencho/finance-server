@@ -1,28 +1,24 @@
-import json
+import datetime
 from urllib.request import Request
 
+import peewee
 from fastapi import FastAPI
-from starlette.authentication import AuthenticationBackend, AuthCredentials, SimpleUser
-from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-import core
-import schema
-import util
 from api.account import account_router
-from api.coin import coin_router
-from core.container import Container
-from exception.exception import FinanceCommonException, FinanceNotFoundException, FinanceUnAuthorizedException
+from core import database
+from core.config import Config
+from repository import account_repository
+from service import account_service
+from schema.account_schema import AccountCreateSchema
 
-container = Container()
-
-db = container.db()
-db.create_database()
+database.db.connect()
+database.db.create_tables(peewee.Model.__subclasses__())
+database.db.close()
 
 # swagger 비활성화
 app = FastAPI(openapi_url=None)
-app.include_router(coin_router)
 app.include_router(account_router)
 
 app.add_middleware(
@@ -36,92 +32,47 @@ app.add_middleware(
 )
 
 
-class BasicAuthBackend(AuthenticationBackend):
-    async def authenticate(self, conn):
-        cookies = conn.cookies
-        jwt_token = cookies.get(core.Config.JWT_COOKIE_NAME)
+@app.on_event('startup')
+async def startup_event():
+    super_admin_account = account_repository.get_by_login_id(Config.SUPER_ADMIN_ID)
 
-        jwt_token_account = None
-        if jwt_token is not None:
-            try:
-                token = util.decode_access_token(token=jwt_token)
-                jwt_token_account = schema.JwtTokenAccount.parse_obj(token)
-            except:
-                # 이 에러는 exp가 만료되었음을 의미함.
-                jwt_token_account: None
-
-        conn.state.current_account = jwt_token_account
-
-        if jwt_token_account is None:
-            return AuthCredentials(['not-authenticated']), SimpleUser('Anonymous')
-        else:
-            return AuthCredentials(['authenticated']), SimpleUser(jwt_token_account.login_id)
+    if super_admin_account is None:
+        account_service.create_account(
+            AccountCreateSchema(
+                login_id=Config.SUPER_ADMIN_ID,
+                password=Config.SUPER_ADMIN_PW,
+                name=Config.SUPER_ADMIN_NAME
+            )
+        )
 
 
-app.add_middleware(AuthenticationMiddleware, backend=BasicAuthBackend())
-
-
+# 미들웨어 처리 -> 모든 요청과 응답을 컨트롤한다.
 @app.middleware("http")
 async def middleware_handler(request: Request, call_next):
     try:
         response = await call_next(request)
 
-        if response.status_code == 403:
-            raise FinanceUnAuthorizedException()
+        return response
+    except Exception as e:
+        if hasattr(e, 'status_code'):
+            status_code = e.status_code
+        else:
+            status_code = 500
 
-        if response.status_code == 404:
-            raise FinanceNotFoundException()
-
-        body = b""
-        async for chunk in response.body_iterator:
-            if chunk != b'null':
-                body += chunk
-
-        # 1. byte to str
-        response_body: str = body.decode('utf-8')
-
-        # 2. check if response_body is json format
-        try:
-            response_body = json.loads(response_body)
-        except json.JSONDecodeError:
-            # 'response body ' is not json format
-            print('not json format')
+        if hasattr(e, 'error'):
+            error = e.error
+        else:
+            error = 'Internal Server Error'
 
         return JSONResponse(
-            content=response_body,
-            headers=dict(response.headers),
-            status_code=200
-        )
-    except FinanceCommonException as e:
-        return JSONResponse(
-            status_code=200,
+            status_code=status_code,
             content={
-                'success': False,
-                'message' : f'{e}'
-            },
-        )
-    except FinanceUnAuthorizedException as e:
-        return JSONResponse(
-            status_code=403,
-            content={
-                'success': False,
-                'message' : f'{e}'
-            },
-        )
-    except FinanceNotFoundException as e:
-        return JSONResponse(
-            status_code=404,
-            content={
-                'success': False,
-                'message': f'{e}'
+                'error': error,
+                'message': e.__str__(),
+                'path': request.url.path,
+                'status': status_code,
+                'timestamp': datetime.datetime.now().__str__()
             }
         )
-    except Exception as e:
-        print(e)
-        return JSONResponse(
-            status_code=200,
-            content={
-                'success': False,
-                'message' : '알수없는 에러가 발생했습니다.'
-            },
-        )
+
+

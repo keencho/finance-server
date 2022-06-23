@@ -1,11 +1,12 @@
-from sqlalchemy import Column, String
+import peewee
+from core.database import db
 
-from core.database import Base
 
+class Market(peewee.Model):
+    code = peewee.CharField(primary_key=True, index=True, unique=True)
+    korean_name = peewee.CharField()
+    english_name = peewee.CharField()
 
-class Market(Base):
-    __tablename__ = 'market'
-
-    code = Column(String, primary_key=True, index=True)
-    korean_name = Column(String)
-    english_name = Column(String)
+    class Meta:
+        database = db
+        db_table = 'coin_market'

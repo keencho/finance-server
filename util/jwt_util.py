@@ -9,7 +9,7 @@ from model.account import Account
 
 
 def create_access_token(account: Account):
-    jwt_token_account = schema.JwtTokenAccount.from_orm(account)
+    jwt_token_account = schema.JwtTokenAccountSchema.from_orm(account)
     jwt_token_account.exp = datetime.utcnow() + timedelta(minutes=int(core.Config.JWT_TOKEN_EXPIRE_MINUTES))
 
     to_encode = jwt_token_account.dict().copy()

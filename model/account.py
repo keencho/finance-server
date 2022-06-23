@@ -1,19 +1,19 @@
 import uuid
 
-from sqlalchemy import Column, String, Integer
+import peewee
+from core.database import db
 
-from core.database import Base
 
+class Account(peewee.Model):
+    id = peewee.UUIDField(unique=True, index=True, primary_key=True, default=uuid.uuid4)
+    login_id = peewee.CharField(unique=True, null=False)
+    name = peewee.CharField(null=False)
+    password = peewee.CharField(null=False)
+    upbit_access_key = peewee.CharField(null=True)
+    upbit_private_key = peewee.CharField(null=True)
+    telegram_token = peewee.CharField(null=True)
+    telegram_chat_id = peewee.CharField(null=True)
 
-class Account(Base):
-    __tablename__ = 'account'
-
-    id = Column(String, primary_key=True, index=True, default=str(uuid.uuid4()))
-    login_id = Column(String, unique=True, nullable=False)
-    name = Column(String, unique=False, nullable=False)
-    password = Column(String, nullable=False)
-    upbit_access_key = Column(String, nullable=True)
-    upbit_private_key = Column(String, nullable=True)
-    telegram_token = Column(String, nullable=True)
-    telegram_chat_id = Column(Integer, nullable=True)
-
+    class Meta:
+        database = db
+        db_table = 'account'

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Response
+from functools import wraps
+
+from fastapi import APIRouter, Response, Depends, Header
 from starlette.requests import Request
 
 import schema
@@ -8,12 +10,21 @@ from service import account_service
 account_router = APIRouter(prefix=f'{ContextPath.CONTEXT_PATH}/account/v1')
 
 
-@account_router.get('/check-auth')
-def check_auth(request: Request):
-    return request.state.current_account
+def check_header_api_key(param=None):
+    def wrapper(func):
+        @wraps(func)
+        def decorator(*args, **kwargs):
+            print(param)
+            # print(param)
+            # print("%s %s" % (func.__name__, "before"))
+            # print("%s %s" % (func.__name__ , "after"))
+            return func(*args, **kwargs)
+        return decorator
+    return wrapper
 
 
 @account_router.post('/check-auth')
+@check_header_api_key
 def check_auth(request: Request):
     return request.state.current_account
 
@@ -31,14 +42,3 @@ async def logout(
         response: Response,
 ):
     return account_service.logout(response)
-
-
-# @account_router.get('/check-duplicate')
-# async def check_duplicate(
-#         login_id: str = None,
-#         account_repository: AccountRepository = Depends(Provide[Container.account_repository])
-# ) -> bool:
-#     if login_id is None or len(login_id) == 0:
-#         return False
-#
-#     return account_repository.get_account_by_login_id(login_id) is None

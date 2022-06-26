@@ -1,6 +1,8 @@
+import enum
 import uuid
 
 import peewee
+
 from core.database import db
 
 
@@ -17,3 +19,9 @@ class Account(peewee.Model):
     class Meta:
         database = db
         db_table = 'account'
+
+
+class AccountType(enum.Enum):
+    ANONYMOUS = 0
+    USER = 1
+    ADMIN = 2

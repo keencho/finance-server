@@ -25,7 +25,7 @@ def login(
 
 @account_router.post('/logout')
 @auth
-async def logout(
+def logout(
         response: Response,
 ):
     return account_service.logout(response)

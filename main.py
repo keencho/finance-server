@@ -1,14 +1,18 @@
 import datetime
-from urllib.request import Request
 
 import peewee
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+import core
+import schema
+import util
 from api.account import account_router
 from core import database
 from core.config import Config
+from core.request_middleware import RequestMiddleware
 from model import AccountType
 from repository import account_repository
 from service import account_service
@@ -32,6 +36,8 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+app.add_middleware(RequestMiddleware)
+
 
 # post construct
 @app.on_event('startup')
@@ -53,6 +59,19 @@ async def startup_event():
 @app.middleware("http")
 async def middleware_handler(request: Request, call_next):
     try:
+        # 요청 시작 전에 request.state.account에 jwt token을 파싱한 account 객체를 담는다.
+        jwt_token_account = None
+        cookies = request.cookies
+        if cookies is not None:
+            jwt_token = cookies.get(core.Config.JWT_COOKIE_NAME)
+            if jwt_token is not None:
+                try:
+                    token = util.decode_access_token(token=jwt_token)
+                    jwt_token_account = schema.JwtTokenAccountSchema.parse_obj(token)
+                except:
+                    pass
+
+        request.state.account = jwt_token_account
         response = await call_next(request)
 
         return response

@@ -1,6 +1,10 @@
 from functools import wraps
 
-from core.exception import NotFoundException
+import core
+import schema
+import util
+from core.exception import UnAuthorizedException
+from model import AccountType
 
 
 def doublewrap(f):
@@ -23,9 +27,36 @@ def doublewrap(f):
 
 
 @doublewrap
-def auth(f, factor=2):
+def auth(f, permit_type=None):
     '''multiply a function's return value'''
+    if permit_type is None:
+        permit_type = [AccountType.USER, AccountType.ADMIN]
+    elif isinstance(permit_type, list) is False:
+        permit_type = [permit_type]
+
     @wraps(f)
     def wrap(*args, **kwargs):
-        return factor*f(*args, **kwargs)
+        request = kwargs.get('request')
+
+        jwt_token_account = None
+        if request is not None:
+            cookies = request.cookies
+            if cookies is not None:
+                jwt_token = cookies.get(core.Config.JWT_COOKIE_NAME)
+                if jwt_token is not None:
+                    try:
+                        token = util.decode_access_token(token=jwt_token)
+                        jwt_token_account_schema = schema.JwtTokenAccountSchema.parse_obj(token)
+
+                        if AccountType[jwt_token_account_schema.type] in permit_type:
+                            jwt_token_account = schema.JwtTokenAccountSchema.parse_obj(token)
+                    except:
+                        pass
+
+        if jwt_token_account is None:
+            raise UnAuthorizedException('인증 실패')
+        else:
+            request.state.account = jwt_token_account
+
+        return f(*args, **kwargs)
     return wrap

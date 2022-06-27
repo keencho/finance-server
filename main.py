@@ -9,6 +9,7 @@ from starlette.responses import JSONResponse
 from api.account import account_router
 from core import database
 from core.config import Config
+from model import AccountType
 from repository import account_repository
 from service import account_service
 from schema.account_schema import AccountCreateSchema
@@ -42,7 +43,8 @@ async def startup_event():
             AccountCreateSchema(
                 login_id=Config.SUPER_ADMIN_ID,
                 password=Config.SUPER_ADMIN_PW,
-                name=Config.SUPER_ADMIN_NAME
+                name=Config.SUPER_ADMIN_NAME,
+                type=AccountType.ADMIN
             )
         )
 

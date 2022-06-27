@@ -12,7 +12,7 @@ account_router = APIRouter(prefix=f'{ContextPath.CONTEXT_PATH}/account/v1')
 @account_router.post('/check-auth')
 @auth
 def check_auth(request: Request):
-    return request.state.current_account
+    return request.state.account
 
 
 @account_router.post('/login')
@@ -24,6 +24,7 @@ def login(
 
 
 @account_router.post('/logout')
+@auth
 async def logout(
         response: Response,
 ):

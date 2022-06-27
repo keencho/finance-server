@@ -17,7 +17,8 @@ def create(account_schema: AccountCreateSchema):
     account = Account(
         login_id=account_schema.login_id,
         password=util.encrypt_password(account_schema.password),
-        name=account_schema.name
+        name=account_schema.name,
+        type=account_schema.type.value
     )
     account.save(force_insert=True)
 

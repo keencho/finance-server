@@ -6,6 +6,12 @@ import peewee
 from core.database import db
 
 
+class AccountType(enum.Enum):
+    ANONYMOUS = 'ANONYMOUS'
+    USER = 'USER'
+    ADMIN = 'ADMIN'
+
+
 class Account(peewee.Model):
     id = peewee.CharField(unique=True, index=True, primary_key=True, default=uuid.uuid4)
     login_id = peewee.CharField(unique=True, null=False)
@@ -15,13 +21,8 @@ class Account(peewee.Model):
     upbit_private_key = peewee.CharField(null=True)
     telegram_token = peewee.CharField(null=True)
     telegram_chat_id = peewee.CharField(null=True)
+    type = peewee.CharField(null=False)
 
     class Meta:
         database = db
         db_table = 'account'
-
-
-class AccountType(enum.Enum):
-    ANONYMOUS = 0
-    USER = 1
-    ADMIN = 2

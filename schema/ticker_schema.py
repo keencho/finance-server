@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class MarketCreateBase(BaseModel):
+class TickerCreateBase(BaseModel):
     code: str
     korean_name: str
     english_name: str

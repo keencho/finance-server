@@ -3,10 +3,10 @@ from starlette.requests import Request
 
 import schema
 from core.decorators import auth
-from core.path import ContextPath
+from core.constant import Constant
 from service import account_service
 
-account_router = APIRouter(prefix=f'{ContextPath.CONTEXT_PATH}/account/v1')
+account_router = APIRouter(prefix=f'{Constant.CONTEXT_PATH}/account/v1')
 
 
 @account_router.post('/check-auth')

@@ -1,66 +1,48 @@
-# from sqlalchemy import create_engine, orm
-#
-# import helper
-# import schema
-# import util
-# from core.database import Base
-# from helper.upbit_helper import *
-# from repository import AccountRepository
-# from repository.market_repository import MarketRepository
-#
-# engine = create_engine(core.Config.DB_FULL_URL)
-# Base.metadata.create_all(engine)
-# session_factory = orm.scoped_session(
-#     orm.sessionmaker(
-#         autocommit=False,
-#         autoflush=False,
-#         bind=engine
-#     )
-# )
-# market_repository = MarketRepository(session_factory=session_factory)
-# account_repository = AccountRepository(session_factory=session_factory)
-#
-#
-# def create_market():
-#     for row in get_market_code():
-#         exist_row = market_repository.get_market_by_code(row['market'])
-#         if exist_row is not None:
-#             continue
-#         base = schema.MarketCreateBase(
-#             code=row['market'],
-#             korean_name=row['korean_name'],
-#             english_name=row['english_name']
-#         )
-#         market_repository.create(base)
-#
-#
-# def is_bull_market(ticker: str):
-#     """
-#     상승장 여부 확인
-#     """
-#     moving_average_window = 5
-#
-#     with util.pandas_beauty_print():
-#         ohlcv = get_ohlcv(ticker)
-#
-#         close_price = ohlcv['close']
-#         # -1: 오늘, -2: 어제
-#         last_ma5 = close_price.rolling(moving_average_window).mean()[-2]
-#         price = helper.get_current_price(ticker)
-#
-#         return price > last_ma5
-#
-#
-# def get_balance(ticker: str):
-#     if len(ticker) == 0:
-#         return None
-#
-#     try:
-#         account_info_list = get_account_info_list()
-#         return next(i for i in account_info_list if i['currency'] == ticker)
-#     except:
-#         return None
-#
-#
-# if __name__ == '__main__':
-#     balance = get_balance('KRW')
+import pprint
+
+import pyupbit
+
+from core import Constant
+from repository import ticker_repository
+from schema import TickerCreateBase
+from service import system_data_service
+
+
+# 업비트 티커 조회
+# verbose: True이면 한글이름, 영어이름까지 (json list)
+#          False 이면 code만 (list)
+def get_tickers(verbose: bool=True):
+    return pyupbit.get_tickers(verbose=verbose)
+
+
+# 업비트 티커 조회 후 db 티커 초기화 & 저장
+def reset_coin_ticker():
+    system_data_service.save_or_update_last_updated(Constant.SystemDataKey.COIN_MARKET_LAST_UPDATED_AT)
+
+    ticker_repository.delete()
+    tickers = get_tickers()
+
+    for ticker in tickers:
+        base = TickerCreateBase(
+            code=ticker['market'],
+            korean_name=ticker['korean_name'],
+            english_name=ticker['english_name']
+        )
+        ticker_repository.create(base)
+
+
+# 업비트 티커 현재가 가져오기
+def get_current_price(ticker="KRW-BTC", verbose=True):
+    return pyupbit.get_current_price(ticker=ticker, verbose=verbose)
+
+
+# 업비트 호가 정보
+def get_orderbook(ticker="KRW-BTC"):
+    i = pyupbit.get_orderbook(ticker)
+    pprint.pprint(i)
+
+
+if __name__ == '__main__':
+    tickers = get_tickers()
+    tickers = tickers[0:10]
+    get_orderbook(tickers)

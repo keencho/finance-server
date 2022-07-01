@@ -1,10 +1,10 @@
 from model import Ticker
-from schema import TickerCreateBase
+from schema import TickerBase
 
 model = Ticker
 
 
-def create(schema: TickerCreateBase):
+def create(schema: TickerBase):
     market = model(
         code=schema.code,
         korean_name=schema.korean_name,
@@ -18,3 +18,7 @@ def create(schema: TickerCreateBase):
 
 def delete():
     model.delete().execute()
+
+
+def list_all():
+    return list(model.select().execute())

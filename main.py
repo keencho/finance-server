@@ -10,6 +10,7 @@ import core
 import schema
 import util
 from api.account import account_router
+from api.coin import coin_router
 from core import database
 from core.config import Config
 from core.request_middleware import RequestMiddleware
@@ -25,6 +26,7 @@ database.db.close()
 # swagger 비활성화
 app = FastAPI(openapi_url=None)
 app.include_router(account_router)
+app.include_router(coin_router)
 
 app.add_middleware(
     CORSMiddleware,

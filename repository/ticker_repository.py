@@ -21,4 +21,4 @@ def delete():
 
 
 def list_all():
-    return list(model.select().execute())
+    return list(model.select().dicts())

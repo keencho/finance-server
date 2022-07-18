@@ -17,8 +17,8 @@ def get_tickers(verbose: bool=True):
 
 
 # DB 티커 조회
-def get_db_tickers():
-    return ticker_repository.list_all()
+def get_db_tickers(code, korean_name, english_name):
+    return ticker_repository.search(code, korean_name, english_name)
 
 
 # 업비트 티커 조회 후 db 티커 초기화 & 저장
@@ -65,3 +65,6 @@ def is_bull_market(ticker=default_ticker):
     current_price = get_current_price(ticker, verbose=False)
     return current_price > target
 
+
+if __name__ == "__main__":
+    reset_coin_ticker()

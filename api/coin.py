@@ -8,8 +8,8 @@ coin_router = APIRouter(prefix=f'{Constant.CONTEXT_PATH}/coin/v1')
 
 # db 티커 조회
 @coin_router.get('/tickers')
-def get_tickers():
-    return coin_service.get_db_tickers()
+def get_tickers(code=None, korean_name=None, english_name=None):
+    return coin_service.get_db_tickers(code, korean_name, english_name)
 
 
 # db 티커 전체 리셋
